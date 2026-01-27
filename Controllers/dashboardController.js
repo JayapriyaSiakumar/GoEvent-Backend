@@ -5,46 +5,60 @@ export const getDashboardStats = async (req, res) => {
   try {
     const { role, _id } = req.user;
 
-    // 🔹 EVENT FILTER
-    const eventFilter = role === "organizer" ? { organizer: _id } : {};
+    // EVENT FILTER
+    const eventFilter =
+      role === "organizer" ? { organizer: _id } : {};
 
-    // 🔹 GET EVENTS
+    // GET EVENTS
     const events = await Event.find(eventFilter).select("_id");
-    const eventIds = events.map((e) => e._id);
 
-    // 🔹 BOOKING FILTER
+    const eventIds = events.map(
+      (e) => new mongoose.Types.ObjectId(e._id)
+    );
+
+    // BOOKING FILTER
     const bookingFilter =
       role === "organizer"
-        ? { event: { $in: eventIds }, paymentStatus: "paid" }
+        ? {
+            event: { $in: eventIds },
+            paymentStatus: "paid",
+          }
         : { paymentStatus: "paid" };
 
-    // Total Events
+    // TOTAL EVENTS
     const totalEvents =
-      role === "organizer" ? eventIds.length : await Event.countDocuments();
+      role === "organizer"
+        ? eventIds.length
+        : await Event.countDocuments();
 
-    // Total Registrations
-    const totalRegistrations = await Booking.countDocuments(bookingFilter);
+    // TOTAL REGISTRATIONS
+    const totalRegistrations =
+      await Booking.countDocuments(bookingFilter);
 
-    // Total Attendees
+    // TOTAL ATTENDEES
     const attendeesAgg = await Booking.aggregate([
       { $match: bookingFilter },
       {
         $group: {
           _id: null,
-          totalAttendees: { $sum: "$tickets" },
+          totalAttendees: {
+            $sum: { $ifNull: ["$tickets", 0] },
+          },
         },
       },
     ]);
 
     const totalAttendees = attendeesAgg[0]?.totalAttendees || 0;
 
-    // Total Revenue
+    // TOTAL REVENUE
     const revenueAgg = await Booking.aggregate([
       { $match: bookingFilter },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$amountPaid" },
+          totalRevenue: {
+            $sum: { $ifNull: ["$totalAmount", 0] },
+          },
         },
       },
     ]);
