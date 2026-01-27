@@ -95,6 +95,7 @@ export const confirmPayment = async (req, res) => {
       `Your Booking is Confirmed`,
       `<h2>Booking  Confirmed</h2>
         <p>Booking is Confirmed and Check Site for Schedules and updates.</p>
+        <a href="https://go-event-ruddy.vercel.app/">https://go-event-ruddy.vercel.app/</a>
         `,
     );
     //console.log("Email Sent");
