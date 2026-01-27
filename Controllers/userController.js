@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import sendEmail from "../Utils/mailer.js";
-import { generateOtp } from "../utils/generateOtp.js";
+import { generateOtp } from "../Utils/generateOtp.js";
 import EmailOtp from "../Models/emailOtpSchema.js";
 
 dotenv.config();
