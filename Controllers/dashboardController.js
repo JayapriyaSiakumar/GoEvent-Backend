@@ -5,60 +5,46 @@ export const getDashboardStats = async (req, res) => {
   try {
     const { role, _id } = req.user;
 
-    // EVENT FILTER
-    const eventFilter =
-      role === "organizer" ? { organizer: _id } : {};
+    // 🔹 EVENT FILTER
+    const eventFilter = role === "organizer" ? { organizer: _id } : {};
 
-    // GET EVENTS
+    // 🔹 GET EVENTS
     const events = await Event.find(eventFilter).select("_id");
+    const eventIds = events.map((e) => e._id);
 
-    const eventIds = events.map(
-      (e) => new mongoose.Types.ObjectId(e._id)
-    );
-
-    // BOOKING FILTER
+    // 🔹 BOOKING FILTER
     const bookingFilter =
       role === "organizer"
-        ? {
-            event: { $in: eventIds },
-            paymentStatus: "paid",
-          }
+        ? { event: { $in: eventIds }, paymentStatus: "paid" }
         : { paymentStatus: "paid" };
 
-    // TOTAL EVENTS
+    // Total Events
     const totalEvents =
-      role === "organizer"
-        ? eventIds.length
-        : await Event.countDocuments();
+      role === "organizer" ? eventIds.length : await Event.countDocuments();
 
-    // TOTAL REGISTRATIONS
-    const totalRegistrations =
-      await Booking.countDocuments(bookingFilter);
+    // Total Registrations
+    const totalRegistrations = await Booking.countDocuments(bookingFilter);
 
-    // TOTAL ATTENDEES
+    // Total Attendees
     const attendeesAgg = await Booking.aggregate([
       { $match: bookingFilter },
       {
         $group: {
           _id: null,
-          totalAttendees: {
-            $sum: { $ifNull: ["$tickets", 0] },
-          },
+          totalAttendees: { $sum: "$quantity" },
         },
       },
     ]);
 
     const totalAttendees = attendeesAgg[0]?.totalAttendees || 0;
 
-    // TOTAL REVENUE
+    // Total Revenue
     const revenueAgg = await Booking.aggregate([
       { $match: bookingFilter },
       {
         $group: {
           _id: null,
-          totalRevenue: {
-            $sum: { $ifNull: ["$totalAmount", 0] },
-          },
+          totalRevenue: { $sum: "$totalAmount" },
         },
       },
     ]);
