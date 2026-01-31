@@ -177,6 +177,7 @@ export const getRevenueChart = async (req, res) => {
         eventId: stat._id,
         eventName: event ? event.title : "Unknown Event",
         revenue: stat.revenue,
+        shortName: event.title.split(" ")[0],
       };
     });
 
