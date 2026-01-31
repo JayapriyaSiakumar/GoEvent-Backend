@@ -147,6 +147,7 @@ export const getRevenueChart = async (req, res) => {
 
     let matchStage = { paymentStatus: "paid" };
 
+    // Organizer should only see their own event revenues
     if (role === "organizer") {
       const events = await Event.find({ organizer: _id }).select("_id");
       const eventIds = events.map((e) => e._id);
@@ -158,37 +159,30 @@ export const getRevenueChart = async (req, res) => {
       { $match: matchStage },
       {
         $group: {
-          _id: { $month: "$createdAt" },
+          _id: "$event", // group by event
           revenue: { $sum: "$totalAmount" },
         },
       },
-      { $sort: { _id: 1 } },
     ]);
 
-    const months = [
-      "",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+    // Fetch event names
+    const eventIds = revenueStats.map((r) => r._id);
+    const eventDocs = await Event.find({ _id: { $in: eventIds } });
 
-    const formattedData = revenueStats.map((item) => ({
-      month: months[item._id],
-      revenue: item.revenue,
-    }));
+    const formatted = revenueStats.map((stat) => {
+      const event = eventDocs.find(
+        (e) => e._id.toString() === stat._id.toString(),
+      );
+      return {
+        eventId: stat._id,
+        eventName: event ? event.title : "Unknown Event",
+        revenue: stat.revenue,
+      };
+    });
 
     res.status(200).json({
       success: true,
-      data: formattedData,
+      data: formatted,
     });
   } catch (error) {
     res.status(500).json({
