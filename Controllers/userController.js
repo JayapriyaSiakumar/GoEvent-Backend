@@ -189,10 +189,10 @@ export const forgotPassword = async (req, res) => {
       userDetail.email,
       "Password Reset link",
       `You are receiving this email because you have requested to reset your password.
-       Please click the following link to reset your password: https://go-event-ruddy.vercel.app/reset-password/${userDetail._id}/${token}
+       Please click the following link to reset your password: ${process.env.FRONT_END_URL}/reset-password/${userDetail._id}/${token}
        If you did not request this, please ignore this email.`,
       `<h3>You are receiving this email because you have requested to reset your password.</h3><br/>
-       Please click the following link to reset your password: <b>https://go-event-ruddy.vercel.app/reset-password/${userDetail._id}/${token}</b>
+       Please click the following link to reset your password: <b>${process.env.FRONT_END_URL}/reset-password/${userDetail._id}/${token}</b>
        If you did not request this, please ignore this email.`,
     );
     //console.log("Email Sent Successfully");

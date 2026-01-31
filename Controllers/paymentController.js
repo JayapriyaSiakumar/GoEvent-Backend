@@ -3,8 +3,10 @@ import stripe from "../Config/Stripe.js";
 import Payment from "../Models/paymentSchema.js";
 import Booking from "../Models/bookingSchema.js";
 import Event from "../Models/eventSchema.js";
+import dotenv from "dotenv";
 import sendEmail from "../Utils/mailer.js";
 
+dotenv.config();
 export const createPaymentIntent = async (req, res) => {
   try {
     const { bookingId, eventId } = req.body;
@@ -95,7 +97,7 @@ export const confirmPayment = async (req, res) => {
       `Your Booking is Confirmed`,
       `<h2>Booking  Confirmed</h2>
         <p>Booking is Confirmed and Check Site for Schedules and updates.</p>
-        <a href="https://go-event-ruddy.vercel.app/">https://go-event-ruddy.vercel.app/</a>
+        <a href="${process.env.FRONT_END_URL}">${process.env.FRONT_END_URL}</a>
         `,
     );
     //console.log("Email Sent");

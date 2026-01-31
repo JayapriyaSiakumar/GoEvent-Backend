@@ -159,7 +159,7 @@ export const getRevenueChart = async (req, res) => {
       {
         $group: {
           _id: { $month: "$createdAt" },
-          revenue: { $sum: "$amountPaid" },
+          revenue: { $sum: "$totalAmount" },
         },
       },
       { $sort: { _id: 1 } },
