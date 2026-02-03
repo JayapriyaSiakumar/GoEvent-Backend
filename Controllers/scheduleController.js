@@ -6,6 +6,11 @@ import User from "../Models/userSchema.js";
 import sendEmail from "../Utils/mailer.js";
 import Booking from "../Models/bookingSchema.js";
 
+function toUtcDate(time) {
+  const [h, m] = time.split(":").map(Number);
+  return new Date(Date.UTC(1970, 0, 1, h, m, 0));
+}
+
 // Get Schedules by Event id
 export const getSchedules = async (req, res) => {
   try {
@@ -82,8 +87,8 @@ export const createSchedule = async (req, res) => {
     const schedule = await Schedule.create({
       eventId,
       title,
-      startTime: new Date(`1970-01-01T${startTime}:00`),
-      endTime: new Date(`1970-01-01T${endTime}:00`),
+      startTime: toUtcDate(startTime),
+      endTime: toUtcDate(endTime),
       speaker,
       description,
       createdBy: _id,
@@ -111,8 +116,8 @@ export const updateSchedule = async (req, res) => {
     const updateData = {
       eventId,
       title,
-      startTime: new Date(`1970-01-01T${startTime}:00`),
-      endTime: new Date(`1970-01-01T${endTime}:00`),
+      startTime: toUtcDate(startTime),
+      endTime: toUtcDate(endTime),
       speaker,
       description,
     };
@@ -286,16 +291,11 @@ export const getEventSchedule = async (req, res) => {
         startTime.getHours(),
         startTime.getMinutes(),
         0,
-        0
+        0,
       );
 
       const endDateTime = new Date(eventDate);
-      endDateTime.setHours(
-        endTime.getHours(),
-        endTime.getMinutes(),
-        0,
-        0
-      );
+      endDateTime.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0);
 
       return {
         title: `${sch.title} (${sch.eventId.title})`,
