@@ -236,7 +236,11 @@ export const updateEventStatus = async (req, res) => {
   try {
     const { status } = req.body;
 
-    if (!["pending", "published", "cancelled", "completed"].includes(status)) {
+    if (
+      !["pending", "published", "cancelled", "completed", "sold-out"].includes(
+        status,
+      )
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid status value",
