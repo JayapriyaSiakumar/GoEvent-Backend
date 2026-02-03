@@ -6,10 +6,10 @@ import User from "../Models/userSchema.js";
 import sendEmail from "../Utils/mailer.js";
 import Booking from "../Models/bookingSchema.js";
 
-function toUtcDate(time) {
+const toUtcDate = (time) => {
   const [h, m] = time.split(":").map(Number);
   return new Date(Date.UTC(1970, 0, 1, h, m, 0));
-}
+};
 
 // Get Schedules by Event id
 export const getSchedules = async (req, res) => {
