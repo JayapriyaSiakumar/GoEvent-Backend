@@ -302,12 +302,9 @@ export const getEventSchedule = async (req, res) => {
         0,
       );
 
-      const startLocal = new Date(
-        startDateTime.getTime() + startDateTime.getTimezoneOffset() * 60000,
-      );
-      const endLocal = new Date(
-        endDateTime.getTime() + endDateTime.getTimezoneOffset() * 60000,
-      );
+      const startLocal = startDateTime.toISOString();
+
+      const endLocal = endDateTime.toISOString();
 
       return {
         title: `${sch.title} (${sch.eventId.title})`,
