@@ -287,16 +287,20 @@ export const getEventSchedule = async (req, res) => {
 
       // 🔥 combine date + time
       const startDateTime = new Date(eventDate);
-      startDateTime.setHours(
-        startTime.getHours(),
-        startTime.getMinutes(),
+      startDateTime.setUTCHours(
+        startTime.getUTCHours(),
+        startTime.getUTCMinutes(),
         0,
         0,
       );
 
       const endDateTime = new Date(eventDate);
-      endDateTime.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0);
-
+      endDateTime.setUTCHours(
+        endTime.getUTCHours(),
+        endTime.getUTCMinutes(),
+        0,
+        0,
+      );
       return {
         title: `${sch.title} (${sch.eventId.title})`,
         start: startDateTime,
