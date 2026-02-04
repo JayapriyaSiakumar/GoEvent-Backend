@@ -284,7 +284,15 @@ export const getEventSchedule = async (req, res) => {
       })
       .sort({ startTime: 1 });
 
-    const calendarEvents = schedules.map((sch) => {
+    // 🔥 Step 1: Filter out schedules with null eventId
+    const withEvents = schedules.filter((sch) => sch.eventId !== null);
+
+    // 🔥 Step 2: Filter upcoming events
+    const upcomingSchedules = withEvents.filter(
+      (sch) => new Date(sch.eventId.startDate) >= new Date(),
+    );
+
+    const calendarEvents = upcomingSchedules.map((sch) => {
       const eventDate = new Date(sch.eventId.startDate);
       const startTime = new Date(sch.startTime);
       const endTime = new Date(sch.endTime);
