@@ -6,12 +6,14 @@ export function startEventStatusCron() {
   cron.schedule("0 0 * * *", async () => {
     try {
       const now = new Date();
+      const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 
       // Update ongoing events
       await Event.updateMany(
         {
-          startDate: { $lte: now },
-          endDate: { $gte: now },
+          startDate: { $lte: endOfDay },
+          endDate: { $gte: startOfDay },
           status: { $ne: "ongoing" },
         },
         { $set: { status: "ongoing", updatedAt: new Date() } },
@@ -20,7 +22,7 @@ export function startEventStatusCron() {
       // Update completed events
       await Event.updateMany(
         {
-          endDate: { $lt: now },
+          endDate: { $gt: endOfDay },
           status: { $ne: "completed" },
         },
         { $set: { status: "completed", updatedAt: new Date() } },
