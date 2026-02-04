@@ -277,7 +277,11 @@ export const sendScheduleEmailToUsers = async (req, res) => {
 export const getEventSchedule = async (req, res) => {
   try {
     const schedules = await Schedule.find()
-      .populate("eventId", "title startDate")
+      .populate({
+        path: "eventId",
+        select: "title startDate status",
+        match: { status: "published" },
+      })
       .sort({ startTime: 1 });
 
     const calendarEvents = schedules.map((sch) => {
