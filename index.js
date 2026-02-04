@@ -8,6 +8,7 @@ import bookingRoute from "./Routes/bookingRoute.js";
 import paymentRoute from "./Routes/paymentRoute.js";
 import dashboardRoute from "./Routes/dashboardRoute.js";
 import scheduleRoute from "./Routes/scheduleRoute.js";
+import { startEventStatusCron } from "./Utils/cronUpdateEventStatus.js";
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ app.use(
 );
 
 connectDB();
+
+// Cron Job to update event status every day at midnight
+startEventStatusCron();
 
 // default route
 app.get("/", (req, res) => {

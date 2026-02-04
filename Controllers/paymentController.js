@@ -91,6 +91,36 @@ export const confirmPayment = async (req, res) => {
       paymentStatus: "paid",
     });
 
+    // 👉 Get booking again (contains ticketType and quantity)
+    const booking = await Booking.findById(payment.booking);
+    const event = await Event.findById(booking.event);
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // 1️⃣ Calculate TOTAL SEATS (sum of event.tickets quantities)
+    const totalSeats = event.tickets.reduce((sum, t) => sum + t.quantity, 0);
+
+    // 2️⃣ Calculate BOOKED SEATS from confirmed bookings
+    const confirmedBookings = await Booking.aggregate([
+      { $match: { event: event._id, bookingStatus: "confirmed" } },
+      { $group: { _id: null, totalBooked: { $sum: "$quantity" } } },
+    ]);
+
+    const bookedSeats =
+      confirmedBookings.length > 0 ? confirmedBookings[0].totalBooked : 0;
+
+    // 3️⃣ Check if SOLD-OUT
+    if (bookedSeats >= totalSeats) {
+      event.status = "sold-out";
+      await event.save();
+    } /* else {
+      if (event.status !== "cancelled" && event.status !== "completed") {
+        event.status = "published";
+      }
+    }
+ */
     await sendEmail(
       req.user.email,
       "Booking Confirmed",
