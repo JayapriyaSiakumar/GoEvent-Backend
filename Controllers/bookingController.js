@@ -79,7 +79,10 @@ export const createBooking = async (req, res) => {
 export const getMyBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id })
-      .populate("event", "title startDate endDate location tickets bannerImage")
+      .populate(
+        "event",
+        "title startDate endDate location tickets bannerImage status",
+      )
       .sort({ createdAt: -1 });
 
     res.json(bookings);
